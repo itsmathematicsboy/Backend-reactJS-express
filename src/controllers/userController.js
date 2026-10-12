@@ -70,7 +70,7 @@ export const getUserById = async (req, res) => {
 };
 
 export const createUser = async (req, res) => {
-    const {nama, email, password} = req.body;
+    const {name, email, password} = req.body;
     // const name = req.body.name;
     // const password = req.body.password;
 
@@ -96,21 +96,29 @@ export const createUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const id = parseInt(req.params.id);
-    const {nama, email, password} = req.body;
+    const {name, email, password} = req.body;
 
-    const [user] = await pool.query("UPDATE users SET name=?, email=?, password=? WHERE id=?", [name, email, password, id]);
+    if (!password) {
+        const [user] = await pool.query("UPDATE users SET name=?, email=? WHERE id=?", [name, email, id]);
+        
+    } else {
+        const [user] = await pool.query(
+            "UPDATE users SET name=?, email=?, password=? WHERE id=?",
+            [name, email, password, id],
+        );
+        
+        return res.status(200).json({
+            status: true,
+            message: 'Update user success',
+            data: user,
+        });
+    }
     // USERS[userindex] = {
     //     ...USERS[userIndex],
     //     ...USERS(nama && {nama}),
     //     ...USERS(email && {email}),
     //     ...USERS(password && {password}),
     // }
-
-    return res.status(200).json({
-        status: true,
-        message: 'Update user success',
-        data: user,
-    });
 
 }
 
